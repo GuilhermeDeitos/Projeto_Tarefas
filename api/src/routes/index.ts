@@ -1,10 +1,10 @@
 import express, {Request, Response, Router} from "express";
-import { TaskController } from "../Controllers/task.controller";
+import { TaskController } from "../controllers/task.controller";
 
 const router: Router = express.Router();
 const taskController = new TaskController();
 
-router.get("/tasks", (res:Response) => {
+router.get("/tasks", (req:Request,res:Response) => {
   taskController.getAllTasks(res);
 });
 

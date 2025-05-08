@@ -1,7 +1,7 @@
 import { ServerDataSource } from "../config/db";
 import { Request, Response } from "express";
-import { Task } from "../Models/Entities/task.entity";
-import { CreateTaskDTO, UpdateTaskDTO } from "../Models/DTO/task.dto";
+import { Task } from "../models/Entities/task.entity";
+import { CreateTaskDTO, UpdateTaskDTO } from "../models/DTO/task.dto";
 import { validate } from "class-validator";
 import {plainToInstance} from "class-transformer";
 import { Repository } from "typeorm";

@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { Task } from '../Models/Entities/task.entity';
+import { Task } from '../models/Entities/task.entity';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
