@@ -1,19 +1,17 @@
 import { TaskStatus } from "../../utils/types";
-import { IsString, IsOptional, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsOptional, MinLength, MaxLength, IsEnum } from 'class-validator';
 
-export class CreateTaskDTO{
-
-  readonly id: Number = 0;
-  
+export class CreateTaskDTO{  
   @IsString()
   @MinLength(3)
   @MaxLength(100)
-  readonly title: String = '';
+  title: string = '';
 
   @IsOptional()
-  readonly description?: String;
-  readonly status: TaskStatus = TaskStatus.Pending;
-  readonly createdAt: Date = new Date();
+  description?: string;
+  
+  @IsEnum(TaskStatus)
+  status: TaskStatus = TaskStatus.Pending;
 }
 
 export class UpdateTaskDTO{
@@ -21,12 +19,13 @@ export class UpdateTaskDTO{
   @MinLength(3)
   @MaxLength(100)
   @IsOptional()
-  readonly title?: String;
+  title?: string;
 
   @IsOptional()
-  readonly description?: String;
+  description?: string;
 
   @IsOptional()
-  readonly status?: TaskStatus;
+  @IsEnum(TaskStatus)
+  status?: TaskStatus;
 }
 
