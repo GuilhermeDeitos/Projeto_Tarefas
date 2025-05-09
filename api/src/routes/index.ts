@@ -1,8 +1,11 @@
 import express, {Request, Response, Router} from "express";
 import { TaskController } from "../controllers/task.controller";
+import { ServerDataSource } from "../config/db";
+import { Task } from "../models/Entities/task.entity";
 
 const router: Router = express.Router();
-const taskController = new TaskController();
+const taskRepository = ServerDataSource.getRepository(Task);
+const taskController = new TaskController(taskRepository);
 
 router.get("/tasks", (req:Request,res:Response) => {
   taskController.getAllTasks(res);

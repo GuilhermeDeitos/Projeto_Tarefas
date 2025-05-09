@@ -1,4 +1,3 @@
-import { ServerDataSource } from "../config/db";
 import { Request, Response } from "express";
 import { Task } from "../models/Entities/task.entity";
 import { CreateTaskDTO, UpdateTaskDTO } from "../models/DTO/task.dto";
@@ -9,8 +8,8 @@ import { Repository } from "typeorm";
 export class TaskController {
   private taskRepository: Repository<Task>;
 
-  constructor() {
-    this.taskRepository = ServerDataSource.getRepository(Task);
+  constructor(taskRepository: Repository<Task>) {
+    this.taskRepository = taskRepository;
   }
 
   async getAllTasks(res: Response): Promise<Response> {
@@ -39,7 +38,6 @@ export class TaskController {
   }
 
   async createTask(req: Request, res: Response): Promise<Response> {
-    // 1. Transformar e validar o DTO
     const taskDTO = plainToInstance(CreateTaskDTO, req.body);
     const errors = await validate(taskDTO);
 
