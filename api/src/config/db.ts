@@ -4,6 +4,17 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+/*
+  * Configuração do banco de dados usando TypeORM.
+  * Esta classe é um singleton que gerencia a conexão com o banco de dados PostgreSQL.
+  *
+  * @class DatabaseConfig
+  * @property {DataSource} dataSource - Instância do DataSource do TypeORM.
+  * @method getInstance - Retorna a instância única da classe DatabaseConfig.
+  * @method getDataSource - Retorna a instância do DataSource.
+  * @method initializeDatabase - Inicializa a conexão com o banco de dados.
+*/
+
 export class DatabaseConfig {
   private static instance: DatabaseConfig;
   private dataSource: DataSource;

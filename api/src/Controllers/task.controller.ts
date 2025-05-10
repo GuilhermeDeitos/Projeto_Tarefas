@@ -2,9 +2,22 @@ import { Request, Response } from "express";
 import { Task } from "../models/Entities/task.entity";
 import { CreateTaskDTO, UpdateTaskDTO } from "../models/DTO/task.dto";
 import { validate } from "class-validator";
-import {plainToInstance} from "class-transformer";
+import { plainToInstance } from "class-transformer";
 import { Repository } from "typeorm";
 
+/*
+  * Controller para gerenciar as operações relacionadas a tarefas.
+  * Ele fornece métodos para criar, ler, atualizar e excluir tarefas.
+  *
+  * @class TaskController
+  * @constructor
+  * @param {Repository<Task>} taskRepository - Repositório para interagir com a entidade Task.
+  * @method getAllTasks - Retorna todas as tarefas.
+  * @method getTaskById - Retorna uma tarefa específica pelo ID.
+  * @method createTask - Cria uma nova tarefa.
+  * @method updateTask - Atualiza uma tarefa existente.
+  * @method deleteTask - Exclui uma tarefa existente.
+*/
 export class TaskController {
   private taskRepository: Repository<Task>;
 
@@ -12,8 +25,8 @@ export class TaskController {
     this.taskRepository = taskRepository;
   }
 
+  // Função para traduzir status de português para inglês, apenas algumas variações são tratadas
   private translateStatus(status: string): string {
-    // Função para traduzir status de português para inglês
     switch (status) {
       case "Pendente":
         return "Pending";
@@ -57,67 +70,63 @@ export class TaskController {
   }
 
   async createTask(req: Request, res: Response): Promise<Response> {
-    
     try {
-      // Caso o status seja passado em português, traduz para inglês
-      if (req.body.status) {
+      if (req.body.status) 
         req.body.status = this.translateStatus(req.body.status);
-      }
-
+      
       const taskDTO = plainToInstance(CreateTaskDTO, req.body);
       const errors = await validate(taskDTO);
 
       if (errors.length > 0) {
-        const errorMessages = errors.flatMap(error => 
+        const errorMessages = errors.flatMap((error) =>
           Object.values(error.constraints || {})
         );
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: errorMessages 
+        return res.status(400).json({
+          message: "Validation failed",
+          errors: errorMessages,
         });
       }
-    
+
       const task = this.taskRepository.create(taskDTO);
       const newTask = await this.taskRepository.save(task);
-
       return res.status(201).json(newTask);
     } catch (error: any) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         message: "Error creating task",
-        error: error.message 
+        error: error.message,
       });
     }
   }
 
   async updateTask(req: Request, res: Response): Promise<Response> {
+    const taskId = parseInt(req.params.id);
     try {
-      const taskId = parseInt(req.params.id);
       const task = await this.taskRepository.findOneBy({ id: taskId });
 
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
       }
 
-      if (req.body.status) {
+      if (req.body.status) 
         req.body.status = this.translateStatus(req.body.status);
-      }
+      
       const updateDTO = plainToInstance(UpdateTaskDTO, req.body);
       const errors = await validate(updateDTO);
 
       if (errors.length > 0) {
-        return res.status(400).json({ 
-          message: "Validation failed", 
-          errors: errors.map(e => Object.values(e.constraints || {})).flat() 
+        return res.status(400).json({
+          message: "Validation failed",
+          errors: errors.map((e) => Object.values(e.constraints || {})).flat(),
         });
       }
-      
-      this.taskRepository.merge(task, updateDTO);      
+
+      this.taskRepository.merge(task, updateDTO);
       const updatedTask = await this.taskRepository.save(task);
       return res.status(200).json(updatedTask);
     } catch (error: any) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         message: "Error updating task",
-        error: error.message 
+        error: error.message,
       });
     }
   }
@@ -131,9 +140,10 @@ export class TaskController {
       }
       await this.taskRepository.delete(taskId);
       return res.status(200).json({ message: "Task deleted successfully" });
-    } catch (error:any) {
-      return res.status(500).json({ message: "Error deleting task", error: error.message });
+    } catch (error: any) {
+      return res
+        .status(500)
+        .json({ message: "Error deleting task", error: error.message });
     }
   }
-
 }

@@ -46,7 +46,7 @@ npm install
 ```
 DB_HOST=localhost
 DB_PORT=5432
-DB_USERNAME=seu_usuario
+DB_USER=seu_usuario
 DB_PASSWORD=sua_senha
 DB_NAME=nome_do_banco
 ```

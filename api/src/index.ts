@@ -9,22 +9,21 @@ env.config();
 
 const app: Express = express();
 const DbConfig = DatabaseConfig.getInstance();
+const PORT = process.env.PORT || 3000;
 
 DbConfig.initializeDatabase()
   .then(() => {
     console.log("Database connected successfully");
-    app.use(cors());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended:true}));
-    app.use(router);
-
-    const PORT = process.env.PORT || 3000;
-
-    app.listen(PORT, () => {
-      console.log(`Server is runnin on port: ${PORT}`);
-    });
   })
   .catch((error) => {
     console.error("Error connecting to the database", error);
   });
 
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(router);
+
+app.listen(PORT, () => {
+  console.log(`Server is runnin on port: ${PORT}`);
+});
