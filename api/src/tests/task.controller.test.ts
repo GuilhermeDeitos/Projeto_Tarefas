@@ -3,6 +3,7 @@ import { validate } from "class-validator";
 import { TaskController } from "../controllers/task.controller";
 import { getRepository } from "./mock.typeorm";
 import { UpdateTaskDTO } from "../models/DTO/task.dto";
+import { TaskStatus } from "../utils/types";
 
 //Express functions mock
 const mockRequest = (body?: any,params?:any) => {
@@ -150,8 +151,9 @@ describe("TaskController", () => {
     it('should return 500 if an error occurs', async () => {
       const req = mockRequest({ title: "Task 1", description: "Description 1" });
       const res = mockResponse();
+      (validate as jest.Mock).mockResolvedValue([]); 
+      
       mockRepository.save.mockRejectedValue(new Error("Database error"));
-
       await controller.createTask(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
@@ -164,12 +166,13 @@ describe("TaskController", () => {
       const mockTask = new UpdateTaskDTO();
       mockTask.title = "Updated Task";
       mockTask.description = "Updated Description";
-      mockTask.status = "Pending";
+      mockTask.status = "Pending" as TaskStatus;
       const req = mockRequest({ title: "Updated Task", description: "Updated Description" }, { id: 1 });
       const res = mockResponse();
-    
-      mockRepository.findOneBy.mockResolvedValue(mockTask); // Simula encontrar a tarefa
-      mockRepository.save.mockResolvedValue(mockTask); // Simula salvar a tarefa
+
+      mockRepository.findOneBy.mockResolvedValue(mockTask);
+      mockRepository.save.mockResolvedValue(mockTask);
+      (validate as jest.Mock).mockResolvedValue([]); 
     
       await controller.updateTask(req, res);
     
@@ -195,6 +198,7 @@ describe("TaskController", () => {
     it('should return 400 if validation fails', async () => {
       const req = mockRequest({ title: "", description: "" }, { id: 1 });
       const res = mockResponse();
+      mockRepository.findOneBy.mockResolvedValue({ id: 1 }); 
       (validate as jest.Mock).mockResolvedValue([{ constraints: { isNotEmpty: "Title should not be empty" } }]); 
 
       await controller.updateTask(req, res);
@@ -206,16 +210,19 @@ describe("TaskController", () => {
     it('should return 500 if an error occurs', async () => {
       const req = mockRequest({}, { id: 1 });
       const res = mockResponse();
-    
-      mockRepository.findOneBy.mockResolvedValue({ id: 1 }); // Simula encontrar a tarefa
-      mockRepository.delete.mockRejectedValue(new Error("Database error")); // Simula erro no delete
-    
-      await controller.deleteTask(req, res);
-    
+
+      mockRepository.findOneBy.mockResolvedValue({ id: 1 });
+      mockRepository.save.mockRejectedValue(new Error("Database error"));
+      (validate as jest.Mock).mockResolvedValue([]);
+      await controller.updateTask(req, res);
       expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+      expect(mockRepository.save).toHaveBeenCalledWith({ id: 1 });
+  
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ message: "Error deleting task", error: "Database error" });
+      expect(res.json).toHaveBeenCalledWith({
+        message: "Error updating task",
+        error: "Database error",
+      });
     });
 
   });
