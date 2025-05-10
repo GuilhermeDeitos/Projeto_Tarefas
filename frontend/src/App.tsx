@@ -4,6 +4,7 @@ import { Card } from "./components/Card";
 import { api } from "./utils/api";
 import "./globalStyle.css";
 import Swal from "sweetalert2";
+import type { AxiosError } from "axios";
 
 export interface Task {
   id: number;
@@ -47,8 +48,10 @@ function App() {
         const res = await api.get("/");
         setTasks(res.data);
         setFilteredTasks(res.data);
-      } catch (err) {
-        setError(true);
+      } catch (err: unknown) {
+        if ((err as AxiosError).response?.status !== 404) {
+          setError(true);
+        } 
         console.error(err);
       } finally {
         setLoading(false);

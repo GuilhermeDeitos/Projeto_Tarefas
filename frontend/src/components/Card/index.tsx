@@ -88,6 +88,7 @@ export function Card({ task, draggable = false, onDragStart }: CardProps) {
   const formattedDate = formatDate(task.createdAt);
 
   const formatDescription = (description: string, maxLength: number) => {
+    if (!description) return [];
     const regex = new RegExp(`.{1,${maxLength}}`, "g");
     return description.match(regex) || [];
   };
